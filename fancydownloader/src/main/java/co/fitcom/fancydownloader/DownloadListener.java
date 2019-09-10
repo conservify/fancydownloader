@@ -4,10 +4,15 @@ package co.fitcom.fancydownloader;
  * Created by triniwiz on 12/13/17.
  */
 
+import java.util.HashMap;
+import java.util.ArrayList;
+
 public abstract class DownloadListener implements DownloadCallback {
     private long lastRefreshTime = 0;
     private long lastBytesWritten = 0;
-    public abstract void onProgress(String task, long currentBytes, long totalBytes,long speed);
+
+    public abstract void onProgress(String task, long currentBytes, long totalBytes, long speed);
+
     void onProgress(String task, long currentBytes, long totalBytes) {
         float percent = (currentBytes * 1.0F) / totalBytes;
         long currentTime = System.currentTimeMillis();
@@ -23,9 +28,9 @@ public abstract class DownloadListener implements DownloadCallback {
             lastRefreshTime = System.currentTimeMillis();
             lastBytesWritten = currentBytes;
         }
-
-    }
+   }
 
    public void onComplete(String task){}
+   public void onHeaders(String task, HashMap<String, ArrayList<String>> headers) {}
    public void onError(String task, Exception e){};
 }

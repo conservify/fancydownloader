@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -144,6 +146,16 @@ public class ManagerService extends Service {
                             BufferedSink sink = null;
                             DownloadListener listener = request.getListener();
                             String taskId = call.request().tag().toString();
+
+                            HashMap<String, ArrayList<String>> newHeaders = new HashMap<String, ArrayList<String>>();
+                            for (String name : response.headers().names()) {
+                                ArrayList<String> values = new ArrayList<String>();
+                                values.addAll(response.headers().values(name));
+                                newHeaders.put(name, values);
+                            }
+                            System.out.println("headers: " + newHeaders.size());
+                            request.getListener().onHeaders(id, newHeaders);
+
                             try {
                                 sink = Okio.buffer(Okio.sink(file));
                                 sink.writeAll(Okio.source(bufferedSource.inputStream()));

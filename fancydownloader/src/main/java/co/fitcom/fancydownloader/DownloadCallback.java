@@ -6,9 +6,12 @@
 
 package co.fitcom.fancydownloader;
 
+import java.util.HashMap;
+import java.util.ArrayList;
 
 interface DownloadCallback{
     void onProgress(String task, long currentBytes, long totalBytes, long speed);
+    void onHeaders(String task, HashMap<String, ArrayList<String>> headers);
     void onComplete(String task);
     void onError(String task, Exception e);
 }

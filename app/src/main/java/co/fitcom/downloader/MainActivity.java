@@ -10,6 +10,9 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.util.HashMap;
+import java.util.ArrayList;
+
 import java.io.File;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -60,6 +63,10 @@ public class MainActivity extends AppCompatActivity {
             public void onError(String task, Exception exception) {
             }
 
+            @Override()
+            public void onHeaders(String task, HashMap<String, ArrayList<String>> headers) {
+            }
+
             @Override
             public void onProgress(String task, final long currentBytes, final long totalBytes,long speed) {
                 runOnUiThread(new Runnable() {
@@ -79,12 +86,16 @@ public class MainActivity extends AppCompatActivity {
         fileRequest.setListener(new DownloadListener() {
             @Override
             public void onComplete(String task) {
-
-
             }
+
+            @Override()
+            public void onHeaders(String task, HashMap<String, ArrayList<String>> headers) {
+            }
+
             @Override
             public void onError(String task, Exception exception) {
             }
+
             @Override
             public void onProgress(String task, final long currentBytes, final long totalBytes,long speed) {
                 runOnUiThread(new Runnable() {

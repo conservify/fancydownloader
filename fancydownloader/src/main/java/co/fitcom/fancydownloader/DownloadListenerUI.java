@@ -6,6 +6,11 @@
 
 package co.fitcom.fancydownloader;
 
+import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -16,11 +21,13 @@ public abstract class DownloadListenerUI extends DownloadListener {
     private static final int WHAT_ERROR = 0x01;
     private static final int WHAT_PROGRESS = 0x02;
     private static final int WHAT_FINISH = 0x03;
+    private static final int WHAT_HEADERS = 0x04;
     private static final String TASK = "task";
     private static final String CURRENT_BYTES = "currentBytes";
     private static final String TOTAL_BYTES = "totalBytes";
     private static final String SPEED = "speed";
     private static final String EXCEPTION = "exception";
+    private static final String HEADERS = "headers";
 
 
     private void ensureHandler() {
@@ -42,6 +49,15 @@ public abstract class DownloadListenerUI extends DownloadListener {
                                 task = errorData.getString(TASK);
                                 Exception exception = (Exception) errorData.getSerializable(EXCEPTION);
                                 onUIError(task, exception);
+                                break;
+                            case WHAT_HEADERS:
+                                Bundle headersData = msg.getData();
+                                if (headersData == null) {
+                                    return;
+                                }
+                                task = headersData.getString(TASK);
+                                HashMap<String, ArrayList<String>> headers = (HashMap<String, ArrayList<String>>)headersData.getSerializable(HEADERS);
+                                onUIHeaders(task, headers);
                                 break;
                             case WHAT_PROGRESS:
                                 Bundle progressData = msg.getData();
@@ -86,6 +102,21 @@ public abstract class DownloadListenerUI extends DownloadListener {
         handler.sendMessage(message);
     }
 
+    public final void onHeaders(String task, HashMap<String, ArrayList<String>> headers) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            onUIHeaders(task, headers);
+            return;
+        }
+        ensureHandler();
+        Message message = handler.obtainMessage();
+        message.what = WHAT_HEADERS;
+        Bundle bundle = new Bundle();
+        bundle.putString(TASK, task);
+        bundle.putSerializable(HEADERS, headers);
+        message.setData(bundle);
+        handler.sendMessage(message);
+    }
+
     public final void onComplete(String task) {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             onUIComplete(task);
@@ -118,6 +149,8 @@ public abstract class DownloadListenerUI extends DownloadListener {
     public abstract void onUIProgress(String task, long currentBytes, long totalBytes, long speed);
 
     public abstract void onUIComplete(String task);
+
+    public abstract void onUIHeaders(String task, HashMap<String, ArrayList<String>> headers);
 
     public abstract void onUIError(String task, Exception e);
 
