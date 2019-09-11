@@ -30,7 +30,7 @@ public abstract class DownloadListener implements DownloadCallback {
         }
    }
 
-   public void onComplete(String task){}
-   public void onHeaders(String task, HashMap<String, ArrayList<String>> headers) {}
+   public void onComplete(String task, int statusCode, HashMap<String, ArrayList<String>> headers) { }
+   public void onHeaders(String task, int statusCode, HashMap<String, ArrayList<String>> headers) {}
    public void onError(String task, Exception e){};
 }

@@ -153,8 +153,8 @@ public class ManagerService extends Service {
                                 values.addAll(response.headers().values(name));
                                 newHeaders.put(name, values);
                             }
-                            System.out.println("headers: " + newHeaders.size());
-                            request.getListener().onHeaders(id, newHeaders);
+
+                            request.getListener().onHeaders(id, response.code(), newHeaders);
 
                             try {
                                 sink = Okio.buffer(Okio.sink(file));
@@ -164,7 +164,7 @@ public class ManagerService extends Service {
                                     File toMove = new File(request.getFilePath(),request.getFileName());
                                     boolean moved = file.renameTo(toMove);
                                     if(moved){
-                                        request.getListener().onComplete(id);
+                                        request.getListener().onComplete(id, response.code(), newHeaders);
                                     }
                                 }
                             } catch (FileNotFoundException e) {
@@ -310,7 +310,16 @@ public class ManagerService extends Service {
                                     File toMove = new File(request.getFilePath(),request.getFileName());
                                     boolean moved = file.renameTo(toMove);
                                     if(moved){
-                                        request.getListener().onComplete(id);
+                                        HashMap<String, ArrayList<String>> newHeaders = new HashMap<String, ArrayList<String>>();
+                                        for (String name : response.headers().names()) {
+                                            ArrayList<String> values = new ArrayList<String>();
+                                            values.addAll(response.headers().values(name));
+                                            newHeaders.put(name, values);
+                                        }
+
+                                        request.getListener().onHeaders(id, response.code(), newHeaders);
+
+                                        request.getListener().onComplete(id, response.code(), newHeaders);
                                     }
                                 }
                             } catch (FileNotFoundException e) {

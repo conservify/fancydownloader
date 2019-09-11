@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 interface DownloadCallback{
     void onProgress(String task, long currentBytes, long totalBytes, long speed);
-    void onHeaders(String task, HashMap<String, ArrayList<String>> headers);
-    void onComplete(String task);
+    void onHeaders(String task, int statusCode, HashMap<String, ArrayList<String>> headers);
+    void onComplete(String task, int statusCode, HashMap<String, ArrayList<String>> headers);
     void onError(String task, Exception e);
 }

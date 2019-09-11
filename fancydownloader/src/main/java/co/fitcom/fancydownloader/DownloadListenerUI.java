@@ -28,6 +28,7 @@ public abstract class DownloadListenerUI extends DownloadListener {
     private static final String SPEED = "speed";
     private static final String EXCEPTION = "exception";
     private static final String HEADERS = "headers";
+    private static final String STATUS_CODE = "statusCode";
 
 
     private void ensureHandler() {
@@ -40,6 +41,8 @@ public abstract class DownloadListenerUI extends DownloadListener {
                     @Override
                     public void handleMessage(Message msg) {
                         String task;
+                        int statusCode;
+                        HashMap<String, ArrayList<String>> headers;
                         switch (msg.what) {
                             case WHAT_ERROR:
                                 Bundle errorData = msg.getData();
@@ -56,8 +59,9 @@ public abstract class DownloadListenerUI extends DownloadListener {
                                     return;
                                 }
                                 task = headersData.getString(TASK);
-                                HashMap<String, ArrayList<String>> headers = (HashMap<String, ArrayList<String>>)headersData.getSerializable(HEADERS);
-                                onUIHeaders(task, headers);
+                                statusCode = headersData.getInt(STATUS_CODE);
+                                headers = (HashMap<String, ArrayList<String>>)headersData.getSerializable(HEADERS);
+                                onUIHeaders(task, statusCode, headers);
                                 break;
                             case WHAT_PROGRESS:
                                 Bundle progressData = msg.getData();
@@ -76,7 +80,9 @@ public abstract class DownloadListenerUI extends DownloadListener {
                                     return;
                                 }
                                 task = finishData.getString(TASK);
-                                onUIComplete(task);
+                                statusCode = finishData.getInt(STATUS_CODE);
+                                headers = (HashMap<String, ArrayList<String>>)finishData.getSerializable(HEADERS);
+                                onUIComplete(task, statusCode, headers);
                                 break;
                         }
                     }
@@ -102,9 +108,9 @@ public abstract class DownloadListenerUI extends DownloadListener {
         handler.sendMessage(message);
     }
 
-    public final void onHeaders(String task, HashMap<String, ArrayList<String>> headers) {
+    public final void onHeaders(String task, int statusCode, HashMap<String, ArrayList<String>> headers) {
         if (Looper.myLooper() == Looper.getMainLooper()) {
-            onUIHeaders(task, headers);
+            onUIHeaders(task, statusCode, headers);
             return;
         }
         ensureHandler();
@@ -112,14 +118,15 @@ public abstract class DownloadListenerUI extends DownloadListener {
         message.what = WHAT_HEADERS;
         Bundle bundle = new Bundle();
         bundle.putString(TASK, task);
+        bundle.putInt(STATUS_CODE, statusCode);
         bundle.putSerializable(HEADERS, headers);
         message.setData(bundle);
         handler.sendMessage(message);
     }
 
-    public final void onComplete(String task) {
+    public final void onComplete(String task, int statusCode, HashMap<String, ArrayList<String>> headers) {
         if (Looper.myLooper() == Looper.getMainLooper()) {
-            onUIComplete(task);
+            onUIComplete(task, statusCode, headers);
             return;
         }
         ensureHandler();
@@ -127,6 +134,8 @@ public abstract class DownloadListenerUI extends DownloadListener {
         message.what = WHAT_FINISH;
         Bundle bundle = new Bundle();
         bundle.putString(TASK, task);
+        bundle.putInt(STATUS_CODE, statusCode);
+        bundle.putSerializable(HEADERS, headers);
         message.setData(bundle);
         handler.sendMessage(message);
     }
@@ -148,9 +157,9 @@ public abstract class DownloadListenerUI extends DownloadListener {
 
     public abstract void onUIProgress(String task, long currentBytes, long totalBytes, long speed);
 
-    public abstract void onUIComplete(String task);
+    public abstract void onUIComplete(String task, int statusCode, HashMap<String, ArrayList<String>> headers);
 
-    public abstract void onUIHeaders(String task, HashMap<String, ArrayList<String>> headers);
+    public abstract void onUIHeaders(String task, int statusCode, HashMap<String, ArrayList<String>> headers);
 
     public abstract void onUIError(String task, Exception e);
 

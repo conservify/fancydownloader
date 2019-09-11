@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         final Request request = new Request(LARGE_IMAGE);
         request.setListener(new DownloadListener() {
             @Override
-            public void onComplete(String task) {
+            public void onComplete(String task, int statusCode, HashMap<String, ArrayList<String>> headers) {
                 String path = request.getFilePath().concat("/");
                 final String imagePath = path.concat(request.getFileName());
                final Bitmap bitmap = decodeSampledBitmapFromFile(imagePath,200,200);
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override()
-            public void onHeaders(String task, HashMap<String, ArrayList<String>> headers) {
+            public void onHeaders(String task, int statusCode, HashMap<String, ArrayList<String>> headers) {
             }
 
             @Override
@@ -85,11 +85,11 @@ public class MainActivity extends AppCompatActivity {
         Request fileRequest = new Request("http://ipv4.download.thinkbroadband.com/20MB.zip");
         fileRequest.setListener(new DownloadListener() {
             @Override
-            public void onComplete(String task) {
+            public void onComplete(String task, int statusCode, HashMap<String, ArrayList<String>> headers) {
             }
 
             @Override()
-            public void onHeaders(String task, HashMap<String, ArrayList<String>> headers) {
+            public void onHeaders(String task, int statusCode, HashMap<String, ArrayList<String>> headers) {
             }
 
             @Override
